@@ -105,7 +105,8 @@
     bookedSlots.add(`${data.date}_${data.time}`);
   });
 
-  let html = `<table style="width: 100%; border-collapse: collapse; min-width: 560px;">`;
+  let html = `<table style="width: 100%; border-collapse: collapse;">`;
+
   html += `<thead><tr>`;
   dates.forEach(date => {
     const label = `${date.getMonth() + 1}/${date.getDate()}<br>(${["일", "월", "화", "수", "목", "금", "토"][date.getDay()]})`;
@@ -213,32 +214,32 @@
   }
 
   /* 📱 모바일 대응 테이블 */
-    @media (max-width: 600px) {
-      #calendar-table table {
-        font-size: 12px;
-        min-width: 560px; /* 표는 넘칠 수 있음 */
-      }
-
-      #calendar-table {
-        overflow-x: auto;
-      }
-    }
-
-    @media (max-width: 600px) {
-  #calendar-table {
-    overflow-x: auto;
-  }
-
+   /* 모바일에서도 표가 스크롤 없이 꽉 차게 */
+@media (max-width: 600px) {
   #calendar-table table {
-    font-size: 11px;           /* 폰트 더 작게 */
-    transform: scale(0.88);    /* 테이블을 화면에 맞게 축소 */
-    transform-origin: left;    /* 왼쪽 기준으로 축소 */
+    font-size: 11px;
+    width: 100% !important;
+    min-width: unset !important;
+    transform: none !important;
   }
 
-  #calendar-table th, #calendar-table td {
-    padding: 2px 4px !important;  /* 셀 안 여백 최소화 */
+  #calendar-table {
+    overflow-x: hidden !important;
+    padding: 0;
+    margin: 0;
+  }
+
+  #calendar-section {
+    padding: 0;
+    margin: 0;
+  }
+
+  body {
+    padding: 0 !important;
+    margin: 0 !important;
   }
 }
+
 
 </style>
 <body style="font-family: sans-serif; text-align: center; padding: 0px;">
@@ -246,7 +247,8 @@
   <!-- 예약 테이블 -->
   <div id="calendar-section" style="margin-top: 0px;">
     <h3 style="text-align: center;">📅 주간 예약 현황</h3>
-    <div id="calendar-table" style="overflow-x: auto;"></div>
+    <div id="calendar-table"></div>
+
   </div>
 
   <!-- 예약 신청 폼 -->
