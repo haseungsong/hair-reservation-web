@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>미용실 예약 시스템</title>
+  <script type="module">
+    // 🔥 Firebase SDK 불러오기
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+    // 🔐 Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXmLMLMUeu1Y_WyDmvfZkg93u4T-nQewM",
+      authDomain: "hair-reservation-78133.firebaseapp.com",
+      projectId: "hair-reservation-78133",
+      storageBucket: "hair-reservation-78133.firebasestorage.app",
+      messagingSenderId: "326975030914",
+      appId: "1:326975030914:web:5f050889459dc09ed3d69b"
+    };
+
+    // 🔧 Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // 🔐 로그인 버튼 클릭
+    window.loginWithGoogle = () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+          alert(`${user.displayName}님 환영합니다!`);
+          document.getElementById("login-section").style.display = "none";
+          document.getElementById("main-section").style.display = "block";
+          generateTimeOptions(); // ✅ 여기도 실행
+        })
+        .catch((error) => {
+          console.error("로그인 실패:", error);
+        });
+    };
+
+    // 자동 로그인 처리
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById("login-section").style.display = "none";
+        document.getElementById("main-section").style.display = "block";
+        document.getElementById("welcome-message").innerText = `${user.displayName}님, 안녕하세요!`;
+      }
+    });
+
+    // 🕘 시간표 생성 함수: 09:00 ~ 18:00 (30분 간격)
+function generateTimeOptions() {
+  const select = document.getElementById("booking-time");
+  if (!select) return;
+
+  select.innerHTML = "";
+  for (let hour = 9; hour <= 18; hour++) {
+    for (let min of [0, 30]) {
+      const h = hour.toString().padStart(2, '0');
+      const m = min.toString().padStart(2, '0');
+      const time = `${h}:${m}`;
+      const option = document.createElement("option");
+      option.value = time;
+      option.textContent = time;
+      select.appendChild(option);
+    }
+  }
+}
+
+// 🔔 로그인 후 booking-section이 보일 때 실행
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById("login-section").style.display = "none";
+    document.getElementById("main-section").style.display = "block";
+    document.getElementById("welcome-message").innerText = `${user.displayName}님, 안녕하세요!`;
+
+    generateTimeOptions(); // ✅ 여기서 실행
+  }
+});
+
+
+// Firebase Firestore 모듈 가져오기
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+// Firestore 초기화
+const db = getFirestore(app);
+
+// 예약 신청 함수
+window.submitBooking = async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
+
+  const date = document.getElementById("booking-date").value;
+  const time = document.getElementById("booking-time").value;
+  const service = document.getElementById("service-type").value;
+  const notes = document.getElementById("notes").value;
+
+  if (!date || !time || !service) {
+    alert("모든 필드를 입력해주세요.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "hairBookings"), {
+      user: user.email,
+      date,
+      time,
+      service,
+      notes,
+      status: "대기 중"
+    });
+    alert("예약이 신청되었습니다!");
+  } catch (error) {
+    console.error("예약 오류:", error);
+    alert("예약 중 오류가 발생했습니다.");
+  }
+};
+
+
+  </script>
+</head>
+
+<style>
+  /* 공통 입력 필드 스타일 */
+  input[type="date"],
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    line-height: 1.5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    height: 44px;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* 모바일 대응 */
+  @media (max-width: 500px) {
+    input[type="date"],
+    input[type="text"],
+    select {
+      font-size: 15px;
+      padding: 10px;
+    }
+  }
+</style>
+
+<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+
+  <!-- 🔐 로그인 영역 -->
+  <div id="login-section">
+    <h2>SHU Hair 예약 시스템</h2>
+    <button onclick="loginWithGoogle()" style="
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background-color: #4285F4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 999;
+">
+  Google 로그인
+</button>
+  </div>
+
+  <!-- 🎉 로그인 후 메인 화면 -->
+  <div id="main-section" style="display:none;">
+    <h2 id="welcome-message"></h2>
+    <p>앞으로 여기에 예약 시스템이 추가됩니다 ✂️</p>
+  </div>
+
+  <div id="booking-section" style="max-width: 400px; margin: 0 auto; text-align: left;">
+    <h3>💈 예약 신청</h3>
+  
+    <label for="booking-date">날짜 선택:</label>
+    <input type="date" id="booking-date" style="width: 100%; padding: 8px;" /><br><br>
+  
+    <label for="booking-time">시간 선택:</label>
+    <select id="booking-time" style="width: 100%; padding: 8px;">
+      <!-- JS로 시간 자동 생성 -->
+    </select><br><br>
+  
+    <label for="service-type">시술 선택:</label>
+    <select id="service-type" style="width: 100%; padding: 8px;">
+      <option value="커트">커트</option>
+      <option value="펌">펌</option>
+      <option value="염색">염색</option>
+      <option value="드라이">드라이</option>
+      <option value="기타">기타</option>
+    </select><br><br>
+  
+    <label for="notes">비고:</label>
+    <input type="text" id="notes" placeholder="요청 사항 입력" style="width: 100%; padding: 8px;" /><br><br>
+  
+    <button onclick="submitBooking()" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px;">
+      예약 신청
+    </button>
+  </div>
+  
+
+</body>
+</html>
