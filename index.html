@@ -29,7 +29,7 @@
       signInWithPopup(auth, provider)
         .then((result) => {
           const user = result.user;
-          alert(${user.displayName}님 환영합니다!);
+          alert(`${user.displayName}님 환영합니다!`);
           document.getElementById("login-section").style.display = "none";
           document.getElementById("main-section").style.display = "block";
           generateTimeOptions(); // ✅ 여기도 실행
