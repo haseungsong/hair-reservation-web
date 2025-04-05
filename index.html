@@ -105,7 +105,7 @@
         bookedSlots.add(`${data.date}_${data.time}`);
       });
   
-      let html = `<table style="width: 100%; border-collapse: collapse; min-width: 700px;">`;
+      let html = `<table style="width: 100%; border-collapse: collapse; min-width: 560px;">`;
       html += `<thead><tr><th style="width: 80px;"></th>`;
       dates.forEach(date => {
         const label = `${date.getMonth() + 1}/${date.getDate()}<br>(${["일", "월", "화", "수", "목", "금", "토"][date.getDay()]})`;
@@ -222,10 +222,10 @@
     }
 
 </style>
-<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+<body style="font-family: sans-serif; text-align: center; padding: 0px;">
 
   <!-- 예약 테이블 -->
-  <div id="calendar-section" style="margin-top: 40px;">
+  <div id="calendar-section" style="margin-top: 0px;">
     <h3 style="text-align: center;">📅 주간 예약 현황</h3>
     <div id="calendar-table" style="overflow-x: auto;"></div>
   </div>
