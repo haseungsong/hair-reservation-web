@@ -29,7 +29,7 @@
       signInWithPopup(auth, provider)
         .then((result) => {
           const user = result.user;
-          alert(`${user.displayName}님 환영합니다!`);
+          alert(${user.displayName}님 환영합니다!);
           document.getElementById("login-section").style.display = "none";
           document.getElementById("main-section").style.display = "block";
           generateTimeOptions(); // ✅ 여기도 실행
@@ -49,8 +49,7 @@
       if (user) {
         document.getElementById("login-section").style.display = "none";
         document.getElementById("main-section").style.display = "block";
-        document.getElementById("calendar-section").style.display = "block"; // ✅추가
-        document.getElementById("welcome-message").innerText = `${user.displayName}님, 안녕하세요!`;
+        document.getElementById("welcome-message").innerText = ${user.displayName}님, 안녕하세요!;
       }
     });
 
@@ -64,7 +63,7 @@ function generateTimeOptions() {
     for (let min of [0, 30]) {
       const h = hour.toString().padStart(2, '0');
       const m = min.toString().padStart(2, '0');
-      const time = `${h}:${m}`;
+      const time = ${h}:${m};
       const option = document.createElement("option");
       option.value = time;
       option.textContent = time;
@@ -78,7 +77,7 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     document.getElementById("login-section").style.display = "none";
     document.getElementById("main-section").style.display = "block";
-    document.getElementById("welcome-message").innerText = `${user.displayName}님, 안녕하세요!`;
+    document.getElementById("welcome-message").innerText = ${user.displayName}님, 안녕하세요!;
 
     generateTimeOptions(); // ✅ 여기서 실행
   }
@@ -141,27 +140,27 @@ function renderCalendarTable() {
   const hours = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
   const dates = getNext7Days();
 
-  let html = `<table style="width: 100%; border-collapse: collapse; min-width: 700px;">`;
-  html += `<thead><tr><th style="width: 80px;"></th>`;
+  let html = <table style="width: 100%; border-collapse: collapse; min-width: 700px;">;
+  html += <thead><tr><th style="width: 80px;"></th>;
 
   dates.forEach(date => {
-    const label = `${date.getMonth() + 1}/${date.getDate()}<br>(${["일","월","화","수","목","금","토"][date.getDay()]})`;
-    html += `<th style="padding: 4px; text-align: center; background: #f5f5f5;">${label}</th>`;
+    const label = ${date.getMonth() + 1}/${date.getDate()}<br>(${["일","월","화","수","목","금","토"][date.getDay()]});
+    html += <th style="padding: 4px; text-align: center; background: #f5f5f5;">${label}</th>;
   });
-  html += `</tr></thead><tbody>`;
+  html += </tr></thead><tbody>;
 
   hours.forEach(time => {
-    html += `<tr><td style="text-align: center; font-weight: bold;">${time}</td>`;
+    html += <tr><td style="text-align: center; font-weight: bold;">${time}</td>;
     dates.forEach(date => {
       const dateStr = date.toISOString().split("T")[0];
-      html += `<td style="text-align: center; padding: 6px; border: 1px solid #ddd;">
+      html += <td style="text-align: center; padding: 6px; border: 1px solid #ddd;">
         <button onclick="openBookingPopup('${dateStr}', '${time}')" style="padding: 4px 8px; font-size: 14px;">예약 가능</button>
-      </td>`;
+      </td>;
     });
-    html += `</tr>`;
+    html += </tr>;
   });
 
-  html += `</tbody></table>`;
+  html += </tbody></table>;
   calendarDiv.innerHTML = html;
 }
 
@@ -171,7 +170,7 @@ let selectedTime = "";
 window.openBookingPopup = (date, time) => {
   selectedDate = date;
   selectedTime = time;
-  document.getElementById("popup-datetime").innerText = `${date} ${time}`;
+  document.getElementById("popup-datetime").innerText = ${date} ${time};
   document.getElementById("popup").style.display = "block";
 };
 
