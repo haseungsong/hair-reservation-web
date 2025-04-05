@@ -26,10 +26,10 @@
 
     // 🔐 로그인 버튼 클릭
     window.loginWithGoogle = () => {
-      signInWithPopup(auth, provider)
+      signInWithRedirect(auth, provider)
         .then((result) => {
           const user = result.user;
-          alert(`${user.displayName}님 환영합니다!`);
+          document.getElementById("welcome-message").innerText = `${user.displayName}님, 안녕하세요!`;
           document.getElementById("login-section").style.display = "none";
           document.getElementById("main-section").style.display = "block";
           generateTimeOptions(); // ✅ 여기도 실행
@@ -37,7 +37,6 @@
               // ✅ 여기에 추가!!
           document.getElementById("calendar-section").style.display = "block";
           renderCalendarTable();
-          
         })
         .catch((error) => {
           console.error("로그인 실패:", error);
@@ -50,6 +49,11 @@
         document.getElementById("login-section").style.display = "none";
         document.getElementById("main-section").style.display = "block";
         document.getElementById("welcome-message").innerText = ${user.displayName}님, 안녕하세요!;
+
+        // ✅ 여기도 추가!!
+    document.getElementById("calendar-section").style.display = "block";
+    renderCalendarTable();
+  
       }
     });
 
