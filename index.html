@@ -33,11 +33,6 @@
           document.getElementById("login-section").style.display = "none";
           document.getElementById("main-section").style.display = "block";
           generateTimeOptions(); // ✅ 여기도 실행
-
-              // ✅ 여기에 추가!!
-          document.getElementById("calendar-section").style.display = "block";
-          renderCalendarTable();
-          
         })
         .catch((error) => {
           console.error("로그인 실패:", error);
@@ -83,193 +78,20 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-
-// Firebase Firestore 모듈 가져오기
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-// Firestore 초기화
-const db = getFirestore(app);
-
-// 예약 신청 함수
-window.submitBooking = async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("로그인이 필요합니다.");
-    return;
-  }
-
-  const date = document.getElementById("booking-date").value;
-  const time = document.getElementById("booking-time").value;
-  const service = document.getElementById("service-type").value;
-  const notes = document.getElementById("notes").value;
-
-  if (!date || !time || !service) {
-    alert("모든 필드를 입력해주세요.");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, "hairBookings"), {
-      user: user.email,
-      date,
-      time,
-      service,
-      notes,
-      status: "대기 중"
-    });
-    alert("예약이 신청되었습니다!");
-  } catch (error) {
-    console.error("예약 오류:", error);
-    alert("예약 중 오류가 발생했습니다.");
-  }
-};
-
-function getNext7Days() {
-  const days = [];
-  const today = new Date();
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    days.push(date);
-  }
-  return days;
-}
-
-function renderCalendarTable() {
-  const calendarDiv = document.getElementById("calendar-table");
-  const hours = ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-  const dates = getNext7Days();
-
-  let html = <table style="width: 100%; border-collapse: collapse; min-width: 700px;">;
-  html += <thead><tr><th style="width: 80px;"></th>;
-
-  dates.forEach(date => {
-    const label = ${date.getMonth() + 1}/${date.getDate()}<br>(${["일","월","화","수","목","금","토"][date.getDay()]});
-    html += <th style="padding: 4px; text-align: center; background: #f5f5f5;">${label}</th>;
-  });
-  html += </tr></thead><tbody>;
-
-  hours.forEach(time => {
-    html += <tr><td style="text-align: center; font-weight: bold;">${time}</td>;
-    dates.forEach(date => {
-      const dateStr = date.toISOString().split("T")[0];
-      html += <td style="text-align: center; padding: 6px; border: 1px solid #ddd;">
-        <button onclick="openBookingPopup('${dateStr}', '${time}')" style="padding: 4px 8px; font-size: 14px;">예약 가능</button>
-      </td>;
-    });
-    html += </tr>;
-  });
-
-  html += </tbody></table>;
-  calendarDiv.innerHTML = html;
-}
-
-let selectedDate = "";
-let selectedTime = "";
-
-window.openBookingPopup = (date, time) => {
-  selectedDate = date;
-  selectedTime = time;
-  document.getElementById("popup-datetime").innerText = ${date} ${time};
-  document.getElementById("popup").style.display = "block";
-};
-
-window.submitPopupBooking = async () => {
-  const user = auth.currentUser;
-  if (!user) return alert("로그인이 필요합니다.");
-
-  const name = document.getElementById("popup-name").value.trim();
-  const phone = document.getElementById("popup-phone").value.trim();
-  const service = document.getElementById("popup-service").value;
-  const note = document.getElementById("popup-note").value;
-
-  if (!name || !phone || !service) {
-    alert("이름, 연락처, 시술 항목은 필수입니다.");
-    return;
-  }
-
-  try {
-    await addDoc(collection(db, "hairBookings"), {
-      user: user.email,
-      name,
-      phone,
-      date: selectedDate,
-      time: selectedTime,
-      service,
-      notes: note,
-      status: "대기 중"
-    });
-    alert("예약 완료되었습니다!");
-    document.getElementById("popup").style.display = "none";
-    renderCalendarTable(); // 새로고침용
-  } catch (err) {
-    console.error("예약 실패", err);
-    alert("예약 실패");
-  }
-};
-
   </script>
 </head>
-
-<style>
-  /* 공통 입력 필드 스타일 */
-  input[type="date"],
-  input[type="text"],
-  select {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 16px;
-    line-height: 1.5;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 16px;
-    height: 44px;
-  }
-
-  label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  /* 모바일 대응 */
-  @media (max-width: 500px) {
-    input[type="date"],
-    input[type="text"],
-    select {
-      font-size: 15px;
-      padding: 10px;
-    }
-  }
-</style>
-
 <body style="font-family: sans-serif; text-align: center; padding: 40px;">
 
   <!-- 🔐 로그인 영역 -->
   <div id="login-section">
-    <h2>SHU Hair 예약 시스템</h2>
-    <button onclick="loginWithGoogle()" style="
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 12px 20px;
-  background-color: #4285F4;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 999;
-">
-  Google 로그인
-</button>
+    <h2>미용실 예약 시스템</h2>
+    <button onclick="loginWithGoogle()" style="padding: 12px 20px; background-color: #4285F4; color: white; border: none; border-radius: 5px; font-size: 16px;">Google 로그인</button>
   </div>
 
   <!-- 🎉 로그인 후 메인 화면 -->
-  <div id="calendar-section" style="display:none; margin-top: 40px;">
-    <h3 style="text-align: center;">📅 주간 예약 현황</h3>
-    <div id="calendar-table" style="overflow-x: auto;"></div>
+  <div id="main-section" style="display:none;">
+    <h2 id="welcome-message"></h2>
+    <p>앞으로 여기에 예약 시스템이 추가됩니다 ✂️</p>
   </div>
 
   <div id="booking-section" style="max-width: 400px; margin: 0 auto; text-align: left;">
@@ -300,27 +122,6 @@ window.submitPopupBooking = async () => {
     </button>
   </div>
   
-
-<!-- 예약 팝업 -->
-<div id="popup" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%);
-  background:#fff; padding:20px; border:1px solid #ccc; border-radius:8px; z-index:999; max-width:300px;">
-  <h3>예약 신청</h3>
-  <p id="popup-datetime"></p>
-  <input type="text" id="popup-name" placeholder="이름 (필수)" required style="width:100%; margin:8px 0; padding:6px;">
-  <input type="text" id="popup-phone" placeholder="연락처 (필수)" required style="width:100%; margin:8px 0; padding:6px;">
-  <select id="popup-service" style="width:100%; margin:8px 0; padding:6px;">
-    <option value="">시술 선택</option>
-    <option value="커트">커트</option>
-    <option value="펌">펌</option>
-    <option value="염색">염색</option>
-    <option value="드라이">드라이</option>
-    <option value="기타">기타</option>
-  </select>
-  <input type="text" id="popup-note" placeholder="비고 (선택)" style="width:100%; margin:8px 0; padding:6px;">
-  <button onclick="submitPopupBooking()" style="background:green; color:white; padding:8px 12px; border:none; border-radius:4px;">예약 신청</button>
-  <button onclick="document.getElementById('popup').style.display='none'" style="margin-left: 8px;">닫기</button>
-</div>
-
 
 </body>
 </html>
