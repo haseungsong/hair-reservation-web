@@ -221,6 +221,22 @@
       }
     }
 
+    @media (max-width: 600px) {
+  #calendar-table {
+    overflow-x: auto;
+  }
+
+  #calendar-table table {
+    font-size: 11px;           /* 폰트 더 작게 */
+    transform: scale(0.88);    /* 테이블을 화면에 맞게 축소 */
+    transform-origin: left;    /* 왼쪽 기준으로 축소 */
+  }
+
+  #calendar-table th, #calendar-table td {
+    padding: 2px 4px !important;  /* 셀 안 여백 최소화 */
+  }
+}
+
 </style>
 <body style="font-family: sans-serif; text-align: center; padding: 0px;">
 
